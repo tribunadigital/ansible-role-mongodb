@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 # Ansible role for MongoDB
 ![Centos](https://github.com/UnderGreen/ansible-role-mongodb/actions/workflows/centos.yml/badge.svg) ![Debian](https://github.com/UnderGreen/ansible-role-mongodb/actions/workflows/debian.yml/badge.svg) ![Ubuntu](https://github.com/UnderGreen/ansible-role-mongodb/actions/workflows/ubuntu.yml/badge.svg) ![Amazon Linux 2](https://github.com/UnderGreen/ansible-role-mongodb/actions/workflows/amazonlinux2.yml/badge.svg)
-=======
-# Ansible role for MongoDB ![Test ansible role on Amazon Linux](https://github.com/sportsru/ansible-role-mongodb/workflows/Test%20ansible%20role%20on%20Amazon%20Linux/badge.svg) ![Test ansible role on CentOS](https://github.com/sportsru/ansible-role-mongodb/workflows/Test%20ansible%20role%20on%20CentOS/badge.svg) ![Test ansible role on Debian](https://github.com/sportsru/ansible-role-mongodb/workflows/Test%20ansible%20role%20on%20Debian/badge.svg) ![Test ansible role on Ubuntu](https://github.com/sportsru/ansible-role-mongodb/workflows/Test%20ansible%20role%20on%20Ubuntu/badge.svg) 
->>>>>>> eeb57fc (Remove TravisCI and add github actions.)
 
 Ansible role to install and manage [MongoDB](http://www.mongodb.org/).
 
@@ -23,10 +19,7 @@ MongoDB support matrix:
 | Debian 9.x     |  :no_entry:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | Debian 10.x    |  :no_entry:   |        :x:         |        :x:         | :white_check_mark: | :white_check_mark: |
 | RHEL 7.x       |  :no_entry:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-<<<<<<< HEAD
 | RHEL 8.x       |  :no_entry:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-=======
->>>>>>> eeb57fc (Remove TravisCI and add github actions.)
 | Amazon Linux 2 |  :no_entry:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 - :white_check_mark: - fully tested
@@ -244,4 +237,4 @@ Licensed under the GPLv2 License. See the [LICENSE.md](LICENSE.md) file for deta
 
 #### Feedback, bug-reports, requests, ...
 
-Are [welcome](https://github.com/UnderGreen/ansible-role-mongodb/issues)!
+Are [welcome](https://github.com/sportsru/ansible-role-mongodb/issues)!
