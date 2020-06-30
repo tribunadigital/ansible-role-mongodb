@@ -20,7 +20,6 @@ mongodb_pymongo_from_pip: true                   # Install latest PyMongo via PI
 mongodb_pymongo_pip_version: 3.11.3
 
 mongodb_user_update_password: "on_create"        # MongoDB user password update default policy
-mongodb_manage_service: true
 mongodb_manage_systemd_unit: true
 mongodb_systemd_unit_limit_nofile: 64000
 mongodb_systemd_unit_limit_nproc: 64000
