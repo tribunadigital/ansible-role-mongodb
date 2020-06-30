@@ -30,8 +30,10 @@ jobs:
       MONGODB_VERSION: ${{ matrix.mongodb_version }}
       MOLECULE_DISTRO: ${{ matrix.molecule_distro }}
     steps:
+
       - name: Checkout
         uses: actions/checkout@v2
+
       - name: Prepare tests
         run: pip install -r requirements.txt
       - name: Run default test

@@ -9,7 +9,7 @@ Ansible role to install and manage [MongoDB](http://www.mongodb.org/).
 - Configure replication
 - Setup MMS automation agent;
 
-MongoDB support matrix:
+MongoDB support matrix (`ansible_python_interpreter=python3`):
 
 | Distribution   | < MongoDB 3.4 |    MongoDB 3.6     |    MongoDB 4.0     |   MongoDB 4.2      |   MongoDB 4.4      |
 | -------------- | :-----------: | :----------------: | :----------------: | :----------------: | :----------------: |
@@ -104,10 +104,8 @@ mongodb_replication_oplogsize: 1024 # specifies a maximum size in megabytes for 
 # Configure setParameter option.
 # Example :
 mongodb_set_parameters:
-  {
-    "enableLocalhostAuthBypass": "true",
-    "authenticationMechanisms": "SCRAM-SHA-1,MONGODB-CR",
-  }
+  "enableLocalhostAuthBypass": "true"
+  "authenticationMechanisms": "SCRAM-SHA-1,MONGODB-CR"
 
 ## Extend config with arbitrary values
 # Example :
@@ -171,22 +169,18 @@ Example vars for authorization:
 ```yaml
 mongodb_security_authorization: "enabled"
 mongodb_users:
-  - {
-    name: testUser,
-    password: passw0rd,
-    roles: readWrite,
+  - name: testUser
+    password: passw0rd
+    roles: readWrite
     database: app_development
-}
 ```
 
 Example vars for oplog user:
 
 ```yaml
 mongodb_oplog_users:
-  - {
-    user: oplog,
+  - user: oplog
     password: passw0rd
-}
 ```
 
 Required vars to change on production:
@@ -208,11 +202,9 @@ mongodb_login_host: 192.168.56.2
 
 # mongodb_replication_params should be configured on each replica set node
 mongodb_replication_params:
-  - {
-      host_name: 192.168.56.2,
-      host_port: "{{ mongodb_net_port }}",
-      host_type: replica,
-    }
+  - host_name: 192.168.56.2
+    host_port: "{{ mongodb_net_port }}"
+    host_type: replica
   # host_type can be replica(default) and arbiter
 ```
 
