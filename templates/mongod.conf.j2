@@ -5,10 +5,10 @@ net:
   ipv6: {{ mongodb_net_ipv6 | to_nice_json }}
   maxIncomingConnections: {{ mongodb_net_maxconns }}
   port: {{ mongodb_net_port }}
-  {% if mongodb_net_ssl_pemfile is defined and mongodb_net_ssl_mode is defined and mongodb_net_ssl == 'enabled' -%}
-  ssl:
-    mode: {{ mongodb_net_ssl_mode }}
-    PEMKeyFile: {{ mongodb_net_ssl_pemfile }}
+  {% if mongodb_net_tls_certificatekeyfile is defined and mongodb_net_tls_mode is defined and mongodb_net_tls == 'enabled' -%}
+  tls:
+    mode: {{ mongodb_net_tls_mode }}
+    certificateKeyFile: {{ mongodb_net_tls_certificatekeyfile }}
   {% endif -%}
   {% if mongodb_config['net'] is defined and mongodb_config['net'] is iterable -%}
   {% for item in mongodb_config['net'] -%}

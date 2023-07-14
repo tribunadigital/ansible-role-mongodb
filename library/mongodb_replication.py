@@ -73,16 +73,15 @@ options:
         required: false
         default: replica
         choices: [ "replica", "arbiter" ]
-    ssl:
+    tls:
         description:
-            - Whether to use an SSL connection when connecting to the database
+            - Whether to use an TLS connection when connecting to the database
         default: False
-    ssl_cert_reqs:
+    tls_allow_invalid_certificates:
         description:
             - Specifies whether a certificate is required from the other side of the connection, and whether it will be validated if provided.
         required: false
-        default: "CERT_REQUIRED"
-        choices: ["CERT_REQUIRED", "CERT_OPTIONAL", "CERT_NONE"]
+        default: False
     build_indexes:
         description:
             - Determines whether the mongod builds indexes on this member.
@@ -135,8 +134,8 @@ EXAMPLES = '''
 # Add 'mongo3.dev:27017' host into replica set as replica and authorization params
 - mongodb_replication: replica_set=replSet login_host=mongo1.dev login_user=siteRootAdmin login_password=123456 host_name=mongo3.dev host_port=27017 state=present
 
-# Add 'mongo4.dev:27017' host into replica set as replica via SSL
-- mongodb_replication: replica_set=replSet host_name=mongo4.dev host_port=27017 ssl=True state=present
+# Add 'mongo4.dev:27017' host into replica set as replica via TLS
+- mongodb_replication: replica_set=replSet host_name=mongo4.dev host_port=27017 tls=True state=present
 
 # Remove 'mongo4.dev:27017' host from the replica set
 - mongodb_replication: replica_set=replSet host_name=mongo4.dev host_port=27017 state=absent
@@ -161,7 +160,6 @@ host_type:
 '''
 
 import os
-import ssl as ssl_lib
 import time
 import traceback
 from datetime import datetime as dtdatetime
@@ -222,7 +220,7 @@ def check_compatibility(module, client):
 def check_members(state, module, client, host_name, host_port, host_type):
     local_db = client['local']
 
-    if local_db.system.replset.count() > 1:
+    if local_db.system.replset.count_documents({}) > 1:
         module.fail_json(msg='local.system.replset has unexpected contents')
 
     cfg = local_db.system.replset.find_one()
@@ -253,7 +251,7 @@ def add_host(module, client, host_name, host_port, host_type, timeout=180, **kwa
             admin_db = client['admin']
             local_db = client['local']
 
-            if local_db.system.replset.count() > 1:
+            if local_db.system.replset.count_documents({}) > 1:
                 module.fail_json(msg='local.system.replset has unexpected contents')
 
             cfg = local_db.system.replset.find_one()
@@ -296,7 +294,7 @@ def remove_host(module, client, host_name, timeout=180):
         try:
             local_db = client['local']
 
-            if local_db.system.replset.count() > 1:
+            if local_db.system.replset.count_documents({}) > 1:
                 module.fail_json(msg='local.system.replset has unexpected contents')
 
             cfg = local_db.system.replset.find_one()
@@ -339,8 +337,8 @@ def wait_for_ok_and_master(module, connection_params, timeout=180):
     start_time = dtdatetime.now()
     while True:
         try:
+            authenticate(module, connection_params["username"], connection_params["password"])
             client = MongoClient(**connection_params)
-            authenticate(module, client, connection_params["username"], connection_params["password"])
 
             status = client.admin.command('replSetGetStatus', check=False)
             if status['ok'] == 1 and status['myState'] == 1:
@@ -357,7 +355,7 @@ def wait_for_ok_and_master(module, connection_params, timeout=180):
         time.sleep(1)
 
 
-def authenticate(module, client, login_user, login_password):
+def authenticate(module, login_user, login_password):
     if login_user is None and login_password is None:
         mongocnf_creds = load_mongocnf()
         if mongocnf_creds is not False:
@@ -365,9 +363,6 @@ def authenticate(module, client, login_user, login_password):
             login_password = mongocnf_creds['password']
         elif login_password is None and login_user is not None:
             module.fail_json(msg='when supplying login arguments, both login_user and login_password must be provided')
-
-    if login_user is not None and login_password is not None:
-        client.admin.authenticate(login_user, login_password)
 
 # =========================================
 # Module execution.
@@ -386,8 +381,8 @@ def main():
             host_name=dict(default='localhost'),
             host_port=dict(default='27017'),
             host_type=dict(default='replica', choices=['replica', 'arbiter']),
-            ssl=dict(default=False, type='bool'),
-            ssl_cert_reqs=dict(default='CERT_REQUIRED', choices=['CERT_NONE', 'CERT_OPTIONAL', 'CERT_REQUIRED']),
+            tls=dict(default=False, type='bool'),
+            tls_allow_invalid_certificates=dict(default=False, type='bool'),
             build_indexes=dict(type='bool', default='yes'),
             hidden=dict(type='bool', default='no'),
             priority=dict(default='1.0'),
@@ -409,7 +404,8 @@ def main():
     host_name = module.params['host_name']
     host_port = module.params['host_port']
     host_type = module.params['host_type']
-    ssl = module.params['ssl']
+    tls = module.params['tls']
+    tls_allow_invalid_certificates = module.params['tls_allow_invalid_certificates']
     state = module.params['state']
     priority = float(module.params['priority'])
 
@@ -429,12 +425,12 @@ def main():
                 "replicaset": replica_set,
             }
 
-        if ssl:
-            connection_params["ssl"] = ssl
-            connection_params["ssl_cert_reqs"] = getattr(ssl_lib, module.params['ssl_cert_reqs'])
+        if tls:
+            connection_params["tls"] = tls
+            connection_params["tlsAllowInvalidCertificates"] = tls_allow_invalid_certificates
 
+        authenticate(module, login_user, login_password)
         client = MongoClient(**connection_params)
-        authenticate(module, client, login_user, login_password)
         client['admin'].command('replSetGetStatus')
 
     except ServerSelectionTimeoutError:
@@ -448,12 +444,12 @@ def main():
                 "serverselectiontimeoutms": 10000,
             }
 
-            if ssl:
-                connection_params["ssl"] = ssl
-                connection_params["ssl_cert_reqs"] = getattr(ssl_lib, module.params['ssl_cert_reqs'])
+            if tls:
+                connection_params["tls"] = tls
+                connection_params["tlsAllowInvalidCertificates"] = tls_allow_invalid_certificates
 
             client = MongoClient(**connection_params)
-            authenticate(module, client, login_user, login_password)
+            client = MongoClient(**connection_params)
             if state == 'present':
                 new_host = {'_id': 0, 'host': "{0}:{1}".format(host_name, host_port)}
                 if priority != 1.0:
@@ -470,8 +466,8 @@ def main():
         module.fail_json(msg='unable to connect to database: %s' % to_native(e), exception=traceback.format_exc())
 
     # reconnect again
+    authenticate(module, login_user, login_password)
     client = MongoClient(**connection_params)
-    authenticate(module, client, login_user, login_password)
     check_compatibility(module, client)
     check_members(state, module, client, host_name, host_port, host_type)
 
