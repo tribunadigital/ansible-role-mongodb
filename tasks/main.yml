@@ -53,7 +53,7 @@
   ignore_errors: true
   when: ( mongodb_security_authorization == 'enabled'
           and not mongodb_replication_replset )
-  no_log: true
+  no_log: "{{ mongodb_no_log | bool }}"
   tags: [mongodb]
 
 - name: Include authorization configuration
@@ -63,28 +63,71 @@
           and mongodb_user_admin_check.rc != 0 )
   tags: [mongodb]
 
-- name: create normal users with replicaset
-  mongodb_user:
+- name: create/delete custom roles with replicaset
+  community.mongodb.mongodb_role:
+    state: "{{ item.state | default('present') }}"
+    name: "{{ item.name }}"
+    database: "{{ item.database }}"
+    privileges: "{{ item.privileges | default([]) }}"
+    roles: "{{ item.roles | default([]) }}"
+    authenticationRestrictions: "{{ item.authenticationRestrictions | default([]) }}"
+    replica_set: "{{ mongodb_replication_replset }}"
+    login_user: "{{ mongodb_user_admin_name }}"
+    login_password: "{{ mongodb_user_admin_password }}"
+    login_port: "{{ mongodb_login_port | default(27017) }}"
+    login_host: "{{ mongodb_login_host | default('localhost') }}"
+    tls: "{{ True if mongodb_net_tls_mode == 'requireTLS' else False }}"
+  with_items:
+    - "{{ mongodb_roles | default([]) }}"
+  when: ( mongodb_replication_replset
+        and mongodb_security_authorization == 'enabled'
+        and mongodb_master is defined and mongodb_master )
+  tags: [mongodb]
+
+- name: create/delete custom roles without replicaset
+  community.mongodb.mongodb_role:
+    state: "{{ item.state | default('present') }}"
+    name: "{{ item.name }}"
+    database: "{{ item.database }}"
+    privileges: "{{ item.privileges | default([]) }}"
+    roles: "{{ item.roles | default([]) }}"
+    authenticationRestrictions: "{{ item.authenticationRestrictions | default([]) }}"
+    login_user: "{{ mongodb_user_admin_name }}"
+    login_password: "{{ mongodb_user_admin_password }}"
+    login_port: "{{ mongodb_net_port | int }}"
+    login_host: "{{ mongodb_login_host|default('localhost') }}"
+    tls: "{{ True if mongodb_net_tls_mode == 'requireTLS' else False }}"
+  with_items:
+    - "{{ mongodb_roles | default([]) }}"
+  when: ( mongodb_security_authorization == 'enabled'
+          and not mongodb_replication_replset )
+  tags: [mongodb]
+
+- name: create/delete normal users with replicaset
+  community.mongodb.mongodb_user:
+    state: "{{ item.state | default('present') }}"
     database: "{{ item.database }}"
     name: "{{ item.name }}"
     password: "{{ item.password }}"
     update_password: "{{ mongodb_user_update_password }}"
     roles: "{{ item.roles }}"
+    replica_set: "{{ mongodb_replication_replset }}"
     login_user: "{{ mongodb_user_admin_name }}"
     login_password: "{{ mongodb_user_admin_password }}"
-    login_port: "{{ mongodb_login_port|default(27017) }}"
-    login_host: "{{ mongodb_login_host|default('localhost') }}"
+    login_port: "{{ mongodb_login_port | default(27017) }}"
+    login_host: "{{ mongodb_login_host | default('localhost') }}"
     tls: "{{ True if mongodb_net_tls_mode == 'requireTLS' else False }}"
   with_items:
     - "{{ mongodb_users | default([]) }}"
   when: ( mongodb_replication_replset
         and mongodb_security_authorization == 'enabled'
         and mongodb_master is defined and mongodb_master )
-  no_log: true
+  no_log: "{{ mongodb_no_log | bool }}"
   tags: [mongodb]
 
-- name: create normal users without replicaset
-  mongodb_user:
+- name: create/delete normal users without replicaset
+  community.mongodb.mongodb_user:
+    state: "{{ item.state|default('present') }}"
     database: "{{ item.database }}"
     name: "{{ item.name }}"
     password: "{{ item.password }}"
@@ -93,17 +136,17 @@
     login_user: "{{ mongodb_user_admin_name }}"
     login_password: "{{ mongodb_user_admin_password }}"
     login_port: "{{ mongodb_net_port | int }}"
-    login_host: "{{ mongodb_login_host|default('localhost') }}"
+    login_host: "{{ mongodb_login_host | default('localhost') }}"
     tls: "{{ True if mongodb_net_tls_mode == 'requireTLS' else False }}"
   with_items:
     - "{{ mongodb_users | default([]) }}"
   when: ( mongodb_security_authorization == 'enabled'
           and not mongodb_replication_replset )
-  no_log: true
+  no_log: "{{ mongodb_no_log | bool }}"
   tags: [mongodb]
 
 - name: create oplog user with replicaset
-  mongodb_user:
+  community.mongodb.mongodb_user:
     database: admin
     user: "{{ item.user }}"
     password: "{{ item.password }}"
@@ -111,6 +154,7 @@
     roles:
       - db: local
         role: read
+    replica_set: "{{ mongodb_replication_replset }}"
     login_user: "{{ mongodb_user_admin_name }}"
     login_password: "{{ mongodb_user_admin_password }}"
     login_port: "{{ mongodb_login_port|default(27017) }}"
@@ -121,7 +165,7 @@
   when: ( mongodb_replication_replset | length > 0
         and mongodb_security_authorization == 'enabled'
         and mongodb_master is defined and mongodb_master )
-  no_log: true
+  no_log: "{{ mongodb_no_log | bool }}"
   tags: [mongodb]
 
 - name: service started

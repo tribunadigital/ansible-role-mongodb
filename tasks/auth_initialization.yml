@@ -20,7 +20,7 @@
     timeout: 120
 
 - name: create administrative user "{{ mongodb_user_admin_name }}"
-  mongodb_user:
+  community.mongodb.mongodb_user:
     database: admin
     name: "{{ item.name }}"
     password: "{{ item.password }}"
@@ -32,10 +32,10 @@
     - name: "{{ mongodb_user_admin_name }}"
       password: "{{ mongodb_user_admin_password }}"
       roles: "userAdminAnyDatabase"
-  no_log: true
+  no_log: "{{ mongodb_no_log | bool }}"
 
 - name: create administrative user "{{ mongodb_root_admin_name }}"
-  mongodb_user:
+  community.mongodb.mongodb_user:
     database: admin
     name: "{{ item.name }}"
     password: "{{ item.password }}"
@@ -47,10 +47,10 @@
     - name: "{{ mongodb_root_admin_name }}"
       password: "{{ mongodb_root_admin_password }}"
       roles: "root"
-  no_log: true
+  no_log: "{{ mongodb_no_log | bool }}"
 
 - name: create backup user "{{ mongodb_root_backup_name }}"
-  mongodb_user:
+  community.mongodb.mongodb_user:
     database: admin
     name: "{{ item.name }}"
     password: "{{ item.password }}"
@@ -62,7 +62,7 @@
     - name: "{{ mongodb_root_backup_name }}"
       password: "{{ mongodb_root_backup_password }}"
       roles: "backup,clusterMonitor"
-  no_log: true
+  no_log: "{{ mongodb_no_log | bool }}"
 
 - name: Move back mongod.conf
   template:

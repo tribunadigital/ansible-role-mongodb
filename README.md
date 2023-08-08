@@ -29,6 +29,9 @@ MongoDB support matrix (`ansible_python_interpreter=python3`):
 #### Variables
 
 ```yaml
+# This variable disable or enable logs for module mongodb_user in tasks.
+mongodb_no_log: true
+
 # This variable is used to set source of MongoDB installation.
 # 'mongodb' - version provided by Debian-based distributions from their official package repositories.
 # 'mongodb-org' - version provided by MongoDB package repository.
@@ -162,12 +165,36 @@ mongodb_root_backup_password: passw0rd
 
 Add `undergreen.mongodb` to your roles and set vars in your playbook file.
 
+Example vars for roles:
+
+```yaml
+mongodb_security_authorization: "enabled"
+mongodb_roles:
+  - state: present
+    name: testRole
+    database: app_development
+    privileges:
+      - resource:
+          db: app_development
+          collection: ""
+        actions:
+          - find
+    roles:
+      - role: "read"
+        db: "admin"
+    authenticationRestrictions:
+      - clientSource:
+          - "127.0.0.1"
+        serverAddress: []
+```
+
 Example vars for authorization:
 
 ```yaml
 mongodb_security_authorization: "enabled"
 mongodb_users:
-  - name: testUser
+  - state: present
+    name: testUser
     password: passw0rd
     roles: readWrite
     database: app_development
