@@ -22,46 +22,34 @@
 - name: create administrative user "{{ mongodb_user_admin_name }}"
   community.mongodb.mongodb_user:
     database: admin
-    name: "{{ item.name }}"
-    password: "{{ item.password }}"
+    name: "{{ mongodb_user_admin_name }}"
+    password: "{{ mongodb_user_admin_password }}"
     update_password: "{{ mongodb_user_update_password }}"
-    roles: "{{ item.roles }}"
-    login_host: "{{ mongodb_net_bindip.split(',') | map('replace', '0.0.0.0', '127.0.0.1') | list  | first }}"
+    roles: 'userAdminAnyDatabase'
+    login_host: '127.0.0.1'
     login_port: "{{ mongodb_net_port | int }}"
-  with_items:
-    - name: "{{ mongodb_user_admin_name }}"
-      password: "{{ mongodb_user_admin_password }}"
-      roles: "userAdminAnyDatabase"
   no_log: "{{ mongodb_no_log | bool }}"
 
 - name: create administrative user "{{ mongodb_root_admin_name }}"
   community.mongodb.mongodb_user:
     database: admin
-    name: "{{ item.name }}"
-    password: "{{ item.password }}"
+    name: "{{ mongodb_root_admin_name }}"
+    password: "{{ mongodb_root_admin_password }}"
     update_password: "{{ mongodb_user_update_password }}"
-    roles: "{{ item.roles }}"
-    login_host: "{{ mongodb_net_bindip.split(',') | map('replace', '0.0.0.0', '127.0.0.1') | list  | first }}"
+    roles: 'root'
+    login_host: '127.0.0.1'
     login_port: "{{ mongodb_net_port | int }}"
-  with_items:
-    - name: "{{ mongodb_root_admin_name }}"
-      password: "{{ mongodb_root_admin_password }}"
-      roles: "root"
   no_log: "{{ mongodb_no_log | bool }}"
 
 - name: create backup user "{{ mongodb_root_backup_name }}"
   community.mongodb.mongodb_user:
     database: admin
-    name: "{{ item.name }}"
-    password: "{{ item.password }}"
+    name: "{{ mongodb_root_backup_name }}"
+    password: "{{ mongodb_root_backup_password }}"
     update_password: "{{ mongodb_user_update_password }}"
-    roles: "{{ item.roles }}"
-    login_host: "{{ mongodb_net_bindip.split(',') | map('replace', '0.0.0.0', '127.0.0.1') | list  | first }}"
+    roles: 'backup,clusterMonitor'
+    login_host: '127.0.0.1'
     login_port: "{{ mongodb_net_port | int }}"
-  with_items:
-    - name: "{{ mongodb_root_backup_name }}"
-      password: "{{ mongodb_root_backup_password }}"
-      roles: "backup,clusterMonitor"
   no_log: "{{ mongodb_no_log | bool }}"
 
 - name: Move back mongod.conf
