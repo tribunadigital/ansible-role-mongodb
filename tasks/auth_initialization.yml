@@ -1,6 +1,6 @@
 ---
 - name: Use different mongod.conf for auth initialization
-  template:
+  ansible.builtin.template:
     src: mongod_init.conf.j2
     dest: /etc/mongod.conf
     owner: root
@@ -8,12 +8,12 @@
     mode: 0644
 
 - name: mongodb restart
-  service:
+  ansible.builtin.service:
     name: "{{ mongodb_daemon_name }}"
     state: restarted
 
 - name: wait when mongodb is started on localhost
-  wait_for:
+  ansible.builtin.wait_for:
     host: "127.0.0.1"
     port: "{{ mongodb_net_port }}"
     delay: 5
@@ -53,7 +53,7 @@
   no_log: "{{ mongodb_no_log | bool }}"
 
 - name: Move back mongod.conf
-  template:
+  ansible.builtin.template:
     src: mongod.conf.j2
     dest: /etc/mongod.conf
     owner: root
@@ -61,14 +61,13 @@
     mode: 0644
 
 - name: mongodb restart
-  service:
+  ansible.builtin.service:
     name: "{{ mongodb_daemon_name }}"
     state: restarted
 
 - name: wait when mongodb is started
-  wait_for:
+  ansible.builtin.wait_for:
     host: "{{ item }}"
     port: "{{ mongodb_net_port }}"
     timeout: 120
   with_items: "{{ mongodb_net_bindip.split(',') | map('replace', '0.0.0.0', '127.0.0.1') | list }}"
-
