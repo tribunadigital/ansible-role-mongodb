@@ -1,0 +1,29 @@
+---
+- name: Manage disable transparent hugepages systemd service file
+  template:
+    src: transparent-hugepages.service.j2
+    dest: /etc/systemd/system/disable-transparent-hugepages.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: run disable-transparent-hugepages
+  when: mongodb_version is version('8.0', '<') | bool
+
+- name: Manage enable transparent hugepages systemd service file
+  template:
+    src: transparent-hugepages.service.j2
+    dest: /etc/systemd/system/enable-transparent-hugepages.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: run enable-transparent-hugepages
+  when: mongodb_version is version('8.0', '>=') | bool
+
+- name: Remove not needed systemd service file of THP
+  file:
+    state: absent
+    path: "/etc/systemd/system/{{ 'enable' if mongodb_version is version('8.0', '<') | bool else 'disable' }}-transparent-hugepages.service"
+  notify: reload systemd
+
+- name: Flush handlers
+  meta: flush_handlers

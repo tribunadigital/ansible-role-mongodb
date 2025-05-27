@@ -49,7 +49,7 @@ mongodb_user_update_password: "on_create" # MongoDB user password update default
 mongodb_manage_systemd_unit: true
 
 # Disable transparent hugepages on systemd debian based installations
-mongodb_disable_transparent_hugepages: false
+mongodb_transparent_hugepages: false
 
 # You can enable or disable NUMA support
 mongodb_use_numa: true

@@ -1,0 +1,19 @@
+# {{ ansible_managed }}
+[Unit]
+Description="Disable Transparent Hugepage before MongoDB boots"
+#WARN: check service name on your system
+# If you are using MongoDB Cloud, service name is "mongodb-mms-automation-agent.service"
+Before={{ mongodb_daemon_name }}.service
+
+[Service]
+Type=oneshot
+{% if mongodb_version is version('8.0', '<') -%}
+ExecStart=/bin/sh -c 'echo never | tee /sys/kernel/mm/transparent_hugepage/enabled > /dev/null && echo never | tee /sys/kernel/mm/transparent_hugepage/defrag > /dev/null && echo 0 | tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag > /dev/null'
+{% else -%}
+ExecStart=/bin/sh -c 'echo always | tee /sys/kernel/mm/transparent_hugepage/enabled > /dev/null && echo defer+madvise | tee /sys/kernel/mm/transparent_hugepage/defrag > /dev/null && echo 0 | tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_ptes_none > /dev/null && echo 1 | tee /proc/sys/vm/overcommit_memory > /dev/null && echo 1 | tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag > /dev/null'
+{% endif %}
+
+[Install]
+#WARN: check service name on your system
+# If you are using MongoDB Cloud, service name is "mongodb-mms-automation-agent.service"
+RequiredBy={{ mongodb_daemon_name }}.service

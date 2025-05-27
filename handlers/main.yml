@@ -11,6 +11,13 @@
     state: started
     daemon_reload: yes
 
+- name: run enable-transparent-hugepages
+  systemd:
+    name: enable-transparent-hugepages
+    enabled: true
+    state: started
+    daemon_reload: yes
+
 - name: mongodb restart
   service:
     name: "{{ mongodb_daemon_name }}"

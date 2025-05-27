@@ -25,7 +25,7 @@ mongodb_manage_systemd_unit: true
 mongodb_systemd_unit_limit_nofile: 64000
 mongodb_systemd_unit_limit_nproc: 64000
 
-mongodb_disable_transparent_hugepages: false
+mongodb_transparent_hugepages: false
 
 mongodb_use_numa: true
 
