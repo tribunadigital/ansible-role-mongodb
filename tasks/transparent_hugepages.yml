@@ -25,5 +25,11 @@
     path: "/etc/systemd/system/{{ 'enable' if mongodb_version is version('8.0', '<') | bool else 'disable' }}-transparent-hugepages.service"
   notify: reload systemd
 
+- name: Remove not needed systemd service file of THP
+  file:
+    state: absent
+    path: "/etc/systemd/system/mongod.service.requires/{{ 'enable' if mongodb_version is version('8.0', '<') | bool else 'disable' }}-transparent-hugepages.service"
+  notify: reload systemd
+
 - name: Flush handlers
   meta: flush_handlers
