@@ -442,13 +442,13 @@ def main():
                 "password": login_password,
                 "authsource": login_database,
                 "serverselectiontimeoutms": 10000,
+                "directConnection": True,
             }
 
             if tls:
                 connection_params["tls"] = tls
                 connection_params["tlsAllowInvalidCertificates"] = tls_allow_invalid_certificates
 
-            client = MongoClient(**connection_params)
             client = MongoClient(**connection_params)
             if state == 'present':
                 new_host = {'_id': 0, 'host': "{0}:{1}".format(host_name, host_port)}
