@@ -40,6 +40,7 @@ mongodb_net_bindip: 127.0.0.1                    # Comma separated list of ip ad
 mongodb_net_ipv6: false                          # Enable IPv6 support (disabled by default)
 mongodb_net_maxconns: 65536                      # Max number of simultaneous connections
 mongodb_net_port: 27017                          # Specify port number
+mongodb_net_compression_compressors: snappy,zstd,zlib   # Specifies the default compressor(s) to use for communication between this mongod or mongos instance
 mongodb_net_tls: disabled                        # Enable or disable ssl connections
 mongodb_net_tls_mode: ""                         # Set the ssl mode (RequireSSL / preferSSL / AllowSSL / disabled)
 mongodb_net_tls_disabledprotocols: "TLS1_0,TLS1_1"      # Set the disable tls protocols (combination of TLS1_0, TLS1_1, TLS1_2, and TLS1_3)

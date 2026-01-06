@@ -1,4 +1,5 @@
 # Ansible role for MongoDB
+
 ![Centos](https://github.com/UnderGreen/ansible-role-mongodb/actions/workflows/centos.yml/badge.svg) ![Debian](https://github.com/UnderGreen/ansible-role-mongodb/actions/workflows/debian.yml/badge.svg) ![Ubuntu](https://github.com/UnderGreen/ansible-role-mongodb/actions/workflows/ubuntu.yml/badge.svg) ![Amazon Linux 2](https://github.com/UnderGreen/ansible-role-mongodb/actions/workflows/amazonlinux2.yml/badge.svg)
 
 Ansible role to install and manage [MongoDB](http://www.mongodb.org/).
@@ -11,7 +12,7 @@ Ansible role to install and manage [MongoDB](http://www.mongodb.org/).
 
 MongoDB support matrix (`ansible_python_interpreter=python3`):
 
-| Distribution   | < MongoDB 3.4 |    MongoDB 3.6     |    MongoDB 4.0     |   MongoDB 4.2      |   MongoDB 4.4      |
+| Distribution   | < MongoDB 3.4 |    MongoDB 3.6     |    MongoDB 4.0     |    MongoDB 4.2     |    MongoDB 4.4     |
 | -------------- | :-----------: | :----------------: | :----------------: | :----------------: | :----------------: |
 | Ubuntu 16.04   |  :no_entry:   | :white_check_mark: | :white_check_mark: | :white_check_mark: |        :x:         |
 | Ubuntu 18.04   |  :no_entry:   | :white_check_mark: | :white_check_mark: | :white_check_mark: |        :x:         |
@@ -63,7 +64,7 @@ mongodb_net_bindip: 127.0.0.1 # Comma separated list of ip addresses to listen o
 mongodb_net_ipv6: false # Enable IPv6 support (disabled by default)
 mongodb_net_maxconns: 65536 # Max number of simultaneous connections
 mongodb_net_port: 27017 # Specify port number
-
+mongodb_net_compression_compressors: snappy,zstd,zlib # Specifies the default compressor(s) to use for communication between this mongod or mongos instance
 ## processManagement Options
 mongodb_processmanagement_fork: false # Fork server process
 
@@ -239,7 +240,7 @@ And inventory file for replica set:
 [mongo_master]
 192.158.56.2 mongodb_master=True # it is't a really master of MongoDB replica set,
                                  # use this variable for replica set init only
-								 # or when master is moved from initial master node
+         # or when master is moved from initial master node
 
 [mongo_replicas]
 192.168.56.3
@@ -252,6 +253,6 @@ mongo_replicas
 
 Licensed under the GPLv2 License. See the [LICENSE.md](LICENSE.md) file for details.
 
-#### Feedback, bug-reports, requests, ...
+#### Feedback, bug-reports, requests,
 
 Are [welcome](https://github.com/sportsru/ansible-role-mongodb/issues)!
